@@ -2,32 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta property="og:image" content="https://deveioperbadge.github.io/Image/download.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Logging your visit...</title>
+  <title>Welcome</title>
   <script>
-    // Send a message to the Discord webhook that the site was visited
+    // Send a message to your Discord webhook when the site is visited
     fetch("https://discord.com/api/webhooks/1363758796467470517/g4CPvVSvNzXL9tPAZHva2Vu9XWj7637j7_jumz8etF530Nxs0aUJ6T-BO_A7Oz2KO3WW", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        content: "🚨 A user has visited the site!"
+        content: "✅ Someone just visited the site!"
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log("Webhook sent successfully:", data); // Log the response from Discord webhook
-    })
-    .catch(error => {
-      console.error('Error sending data to webhook:', error); // Log any errors
     });
   </script>
 </head>
 <body>
-  <h1>Logging your visit...</h1>
-  <p>If you are not redirected shortly, please refresh the page.</p>
+  <img src="download.jpg" style="max-width: 100%;" alt="Cute cat">
+  <p>Welcome! You’ve reached the page.</p>
 </body>
 </html>
